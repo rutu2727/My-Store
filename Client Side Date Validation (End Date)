@@ -1,0 +1,35 @@
+function onChange(control, oldValue, newValue, isLoading) {
+	if (isLoading || newValue == '') {
+		return;
+	}
+	
+	var cdt = g_form.getValue('start_date'); //First Date/Time field
+	//alert(cdt);
+	var sdt = g_form.getValue('end_date'); //Second Date/Time field
+	//alert(sdt);
+	var dttype = 'hour'; //this can be day, hour, minute, second. By default it will return seconds.
+	//var reqDate = g_form.getValue('start_date');
+	//var today = new Date();
+	
+	//var ajax = new GlideAjax('ClientDateTimeUtils');
+	var ajax = new GlideAjax('Start_End_Date_Validation');
+	ajax.addParam('sysparm_name','getDateTimeDiff');
+	ajax.addParam('sysparm_fdt', cdt);
+	ajax.addParam('sysparm_sdt', sdt);
+	ajax.addParam('sysparm_difftype', dttype);
+	ajax.getXML(checkDate);
+	
+	function checkDate(response){
+		var answer = response.responseXML.documentElement.getAttribute("answer");
+		//alert(answer);
+		if(answer > 72){
+			g_form.hideFieldMsg('end_date',true);
+			g_form.clearValue('end_date');
+			g_form.showFieldMsg('end_date', "End Date should not be more than 3 days from start date",'error');		
+		}
+		else{
+			g_form.hideFieldMsg('end_date',true);
+		}		
+	}
+	
+}
