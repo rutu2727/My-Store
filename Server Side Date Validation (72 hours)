@@ -1,0 +1,32 @@
+var Start_End_Date_Validation = Class.create();
+Start_End_Date_Validation.prototype = Object.extendsObject(AbstractAjaxProcessor,{
+	
+	//Takes a Single Date/Time Field and returns its time difference from nowDateTime().
+	//params = sysparm_fdt (the first date/time field), sysparm_difftype (time based format to return result. See "_calcDateDiff" function comments)
+	getDateTimeDiff: function(){
+		var firstDT = this.getParameter('sysparm_fdt'); //First Date-Time Field
+		var secondDT = this.getParameter('sysparm_sdt'); // Second Date-Time Field
+		var diffTYPE = this.getParameter('sysparm_difftype'); // Date-Time Type to return the answer as. Can be second, minute, hour, day
+		var diff = gs.dateDiff(firstDT, secondDT, true);
+		var timediff = this._calcDateDiff(diffTYPE, diff);
+		//return "getDateTimeDiff: FIRST DT: " + firstDT + " -SECOND DT: " + secondDT + " -DIFFTYPE: " + diffTYPE + " -TIME DIFF: " + timediff;
+		return timediff;
+	},
+	//Returns the Date/Time of right now.
+	getNowDateTime: function(){
+		var now = gs.nowDateTime(); //Now Date/Time
+		return now;
+	},
+	//Private function to calculate the date difference return result in second, minute, hour, day.
+	_calcDateDiff: function(diffTYPE, seconds){
+		var thisdiff;
+		if (diffTYPE == "day"){thisdiff = seconds/86400;}
+			else if (diffTYPE == "hour"){thisdiff = seconds/3600;}
+				else if (diffTYPE == "minute"){thisdiff = seconds/60;}
+					else if (diffTYPE == "second"){thisdiff = seconds;}
+						else {thisdiff = seconds;}
+							return thisdiff;
+						},
+						
+						type: 'Start_End_Date_Validation'
+					});
