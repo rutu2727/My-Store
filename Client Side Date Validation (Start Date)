@@ -1,0 +1,29 @@
+function onChange(control, oldValue, newValue, isLoading) {
+	if (isLoading || newValue == '') {
+		return;
+	}
+	
+	var sdt = g_form.getValue('start_date');
+	//alert(sdt);
+	//var today = new Date();
+	
+	//var ajax = new GlideAjax('ClientDateTimeUtils');
+	var ajax = new GlideAjax('Start_End_Date_Validation');
+	ajax.addParam('sysparm_name','getNowDateTime');
+	ajax.addParam('sysparm_sdt', sdt);
+	ajax.getXML(checkStartDate);
+	
+	function checkStartDate(response){
+		var answer = response.responseXML.documentElement.getAttribute("answer");
+		//alert(answer);
+		if(answer >= newValue){
+			g_form.hideFieldMsg('start_date',true);
+			g_form.clearValue('start_date');
+			g_form.showFieldMsg('start_date', "Start Date must not be in the past.",'error');
+		}
+		else{
+			g_form.hideFieldMsg('start_date',true);
+		}
+	}
+	
+}
