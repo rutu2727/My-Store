@@ -1,0 +1,34 @@
+function onChange(control, oldValue, newValue, isLoading) {
+	if (isLoading || newValue == '') {
+		return;
+	}
+	
+	var sdt = g_form.getValue('start_date');
+	var edt = g_form.getValue('end_date');
+	if(edt>sdt){
+		var ga = new GlideAjax('clientDateTimeValidation');
+		ga.addParam('sysparm_name', 'getScheduledDueDate');
+		ga.addParam('sysparm_sdt', sdt);
+		ga.addParam('sysparm_edt', edt);
+		ga.getXML(checkEndDate);
+	}
+	else
+		{
+		g_form.hideFieldMsg('end_date',true);
+		g_form.clearValue('end_date');
+		g_form.showFieldMsg('end_date', "End Date should not be before start date",'error');
+	}
+	
+	function checkEndDate(response) {
+		var answer = response.responseXML.documentElement.getAttribute("answer");
+		if(answer > 72){
+			g_form.hideFieldMsg('end_date',true);
+			g_form.clearValue('end_date');
+			g_form.showFieldMsg('end_date', "End Date should not be more than 72 business hours from start date",'error');
+		}
+		else{
+			g_form.hideFieldMsg('end_date',true);
+		}
+	}
+	
+}
