@@ -1,0 +1,84 @@
+var Date_Time_Common_Utility = Class.create();
+Date_Time_Common_Utility.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+	
+	
+	//Get Scheduled end date
+	getScheduledEndDate : function(){
+		
+		var startDate = this.getParameter('sysparm_sdt');
+		var endDate = this.getParameter('sysparm_edt');
+ 		startDate = new GlideDateTime(startDate);
+		endDate = new GlideDateTime(endDate);
+		var days = 3;
+		var dur = new GlideDuration(60 * 60 * 24 * 1000 * days);
+		var schedule = new GlideSchedule(gs.getProperty('rms.ss.support.schedule.sysid'));
+		var scheduleEndDate = schedule.add(startDate, dur);
+		
+		//get difference of User entered end date and sheduled end date
+		var diffSeconds = gs.dateDiff(endDate, scheduleEndDate, true);
+		return diffSeconds; 
+	},
+	
+	//Get Difference between dates in seconds
+	getDateTimeDiff: function(){
+		var firstDT = this.getParameter('sysparm_fdt');
+		var secondDT = this.getParameter('sysparm_sdt');
+		var diffTYPE = this.getParameter('sysparm_difftype');
+		var diff = gs.dateDiff(firstDT, secondDT, true);
+		var timediff = this._calcDateDiff(diffTYPE, diff);
+		return timediff;
+	},
+	
+	getNowDateTime: function(){
+		var now = gs.nowDateTime();
+		return now;
+	},
+	
+	//calculate differnence in seconds
+	_calcDateDiff: function(diffTYPE, seconds){
+		var thisdiff;
+		if (diffTYPE == "day"){thisdiff = seconds/86400;}
+			else if (diffTYPE == "hour"){thisdiff = seconds/3600;}
+				else if (diffTYPE == "minute"){thisdiff = seconds/60;}
+					else if (diffTYPE == "second"){thisdiff = seconds;}
+						else {thisdiff = seconds;}
+							return thisdiff;
+	},
+	
+	//Get date time after a certail number of days considering 24*5 schedule
+	getScheduledDueDate : function(days){
+		//current.due_date.setValue(gs.daysAgo(-22));
+		var startDate = new GlideDateTime();
+		//var days = 7;
+		var dur = new GlideDuration(60 * 60 * 24 * 1000 * days);
+		var schedule = new GlideSchedule(gs.getProperty('rms.ss.support.schedule.sysid'));
+		var end = schedule.add(startDate, dur);
+		return end.getDate().getDisplayValue();
+	},
+	
+	
+	//called from UI action condition
+	getBusinessService: function(grObject){
+		var gr = new GlideRecord('incident');
+		gr.addEncodedQuery("business_serviceSTARTSWITHIT-Mobile");
+		gr.addQuery('sys_id',grObject.sys_id);
+		gr.query();
+		if(gs.hasRole("mobile_service_engineer") && gr.next())
+			return true;
+		return false;
+	},
+	//called from ACl on sc_request table
+	getMobilPhoneItem: function(grObject){
+		var gr = new GlideRecord('sc_req_item');
+		gr.addQuery('request',grObject.sys_id);
+		gr.addQuery('cat_item','f8969c063769dbc092e57c1643990ee3'); //Sys_id of mobile phone catalog item
+		gr.query();
+		if(gs.hasRole("mobile_service_engineer") && gr.next())
+			return true;
+		return false;
+	},
+	
+	
+	
+	type: 'Date_Time_Common_Utility'
+});
