@@ -11,3 +11,18 @@ while(rec.next()) {
 		gs.eventQueue('kb.expiry.date.60',rec,'','');
 	}
 }
+
+
+
+var ckDate = new GlideDate();
+ckDate.addDays(30);
+gs.print(ckDate);
+var kb = new GlideRecord('kb_knowledge');
+kb.addQuery('workflow_state','published');
+kb.addQuery('valid_to', ckDate);
+kb.query();
+gs.print("Records in table: " + kb.getRowCount());
+while(kb.next()) {
+gs.print("inside while");
+	gs.eventQueue('kb.expiry.date.30',kb,'','');
+}
