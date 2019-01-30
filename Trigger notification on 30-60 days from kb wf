@@ -1,0 +1,13 @@
+var ckDt = new GlideDate();
+var rec = new GlideRecord('kb_knowledge');
+rec.addQuery('workflow_state','published');
+rec.addQuery('valid_to', ckDt);
+rec.query();
+while(rec.next()) {
+	if(ckDt.addDays(30)){
+		gs.eventQueue('kb.expiry.date.30',rec,'','');
+	}
+	else if(ckDt.addDays(60)){
+		gs.eventQueue('kb.expiry.date.60',rec,'','');
+	}
+}
