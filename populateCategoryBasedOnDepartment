@@ -1,0 +1,43 @@
+var populateCategoryBasedOnDepartment = Class.create();
+populateCategoryBasedOnDepartment.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+	
+	getCategory: function(){
+		
+		var deparment= this.getParameter('sysparm_deparment');
+		var choiceRec = new GlideRecord('sys_choice');
+		choiceRec.addQuery('name','incident');
+		choiceRec.addQuery('element','category');
+		choiceRec.addQuery('dependent_value',deparment);
+		choiceRec.addQuery('inactive',false);
+		choiceRec.query();
+		while(choiceRec.next()){
+			
+			this._addCategory(choiceRec.label,choiceRec.value);
+		}
+		
+	},
+	
+	getCategoryforItem: function(){
+		
+		var department= this.getParameter('sysparm_department');
+		var choiceRec = new GlideRecord('sys_choice');
+		choiceRec.addQuery('name','sc_req_item');
+		choiceRec.addQuery('element','u_category');
+		choiceRec.addQuery('dependent_value',department);
+		choiceRec.addQuery('inactive',false);
+		choiceRec.query();
+		while(choiceRec.next()){
+			
+			this._addCategory(choiceRec.label,choiceRec.value);
+		}
+		
+	},
+	
+	_addCategory :function(name,value){
+		var cates = this.newItem("categoryValueLebel");
+		cates.setAttribute("name",name);
+		cates.setAttribute("value",value);
+		
+	},
+	type: 'populateCategoryBasedOnDepartment'
+});
