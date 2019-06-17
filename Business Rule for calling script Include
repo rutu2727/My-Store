@@ -1,3 +1,6 @@
-var grp = new setAssignmentGroupFromCI();
-	var ass_grp= grp.setAssignmentGrpChgTask(current.change_request);
+(function executeRule(current, previous /*null when async*/) {
+	
+	var grp = new setAssignmentGroupFromCI();
+	var ass_grp= grp.setAssignmentGrp(current);
 	current.assignment_group= ass_grp;
+})(current, previous);
