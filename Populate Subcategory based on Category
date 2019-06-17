@@ -1,0 +1,30 @@
+function onChange(control, oldValue, newValue, isLoading) {
+	if (isLoading || newValue == '') {
+		return;
+	}
+	g_form.clearOptions('subcategory');
+	var getSCategory = new GlideAjax("populateSubcategoryforIT");
+	
+	getSCategory.addParam("sysparm_name","getSubcategoryForIT");
+	getSCategory.addParam("sysparm_category",newValue);
+	getSCategory.getXML(ajaxResponse);
+	
+	function ajaxResponse(response) {
+		var SubCategoryTagNames = response.responseXML.getElementsByTagName("SubCategoryTagNamesValue");
+		if(newValue != 'applications'){
+			g_form.setVisible('subcategory',true);
+			g_form.setMandatory('subcategory',true);
+			g_form.addOption('subcategory','','--None--');
+		}
+		else{
+			g_form.setMandatory('subcategory',false);
+			g_form.setVisible('subcategory',false);
+		}
+		
+		for(var i = 0; i < SubCategoryTagNames.length; i ++) {
+			var name = SubCategoryTagNames[i].getAttribute("name");
+			var value = SubCategoryTagNames[i].getAttribute("value");
+			g_form.addOption('subcategory',value,name);
+		}
+	}
+}
