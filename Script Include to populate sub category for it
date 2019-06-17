@@ -1,0 +1,41 @@
+var populateSubcategoryforIT = Class.create();
+populateSubcategoryforIT.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+	getSubcategoryForIT : function(){
+		
+		var category= this.getParameter('sysparm_category');
+		var choiceRec = new GlideRecord('sys_choice');
+		choiceRec.addQuery('name','incident');
+		choiceRec.addQuery('element','subcategory');
+		choiceRec.addQuery('dependent_value',category);
+		choiceRec.addQuery('inactive',false);
+		choiceRec.query();
+		while(choiceRec.next()){
+			this._addSubCategoryValueLabel(choiceRec.label,choiceRec.value);
+		}
+		
+	},
+	getSubcategoryForChange : function(){
+		var category= this.getParameter('sysparm_category');
+		var choiceRec = new GlideRecord('sys_choice');
+		choiceRec.addQuery('name','change_request');
+		choiceRec.addQuery('element','u_subcategory');
+		choiceRec.addQuery('dependent_value',category);
+		choiceRec.addQuery('inactive',false);
+		choiceRec.query();
+		while(choiceRec.next()){
+			
+			this._addSubCategoryValueLabel(choiceRec.label,choiceRec.value);
+			
+		}
+		
+	},
+	
+	_addSubCategoryValueLabel :function(name,value){
+		var SubCategoryTag = this.newItem("SubCategoryTagNamesValue");
+		SubCategoryTag.setAttribute("name",name);
+		SubCategoryTag.setAttribute("value",value);
+		
+	},
+	
+	type: 'populateSubcategoryforIT'
+});
