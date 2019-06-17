@@ -1,0 +1,3 @@
+var grp = new setAssignmentGroupFromCI();
+	var ass_grp= grp.setAssignmentGrpChgTask(current.change_request);
+	current.assignment_group= ass_grp;
