@@ -1,0 +1,20 @@
+function onLoad() {
+	var deparment='it';
+	var ga = new GlideAjax("populateCategoryBasedOnDepartment");
+	ga.addParam("sysparm_name","getCategory");
+	ga.addParam("sysparm_deparment",deparment);
+	ga.getXML(ajaxResponse);
+	
+	function ajaxResponse(response) {
+		var categories = response.responseXML.getElementsByTagName("categoryValueLebel");
+		
+		for(var i = 0; i < categories.length; i ++) {
+			
+			var name = categories[i].getAttribute("name");
+			var value = categories[i].getAttribute("value");
+			g_form.addOption('category',value,name);
+			
+		}
+	}
+		
+}
