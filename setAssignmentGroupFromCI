@@ -1,0 +1,28 @@
+var setAssignmentGroupFromCI = Class.create();
+setAssignmentGroupFromCI.prototype = {
+	initialize: function() {
+	},
+	setAssignmentGrp: function(object){
+		
+		var application = new GlideRecord('cmdb_ci_appl');
+		application.addQuery('sys_id',object.u_application);
+		application.query();
+		
+		if(application.next()){
+			
+			if(application.support_group)
+				return application.support_group;
+		}
+		},
+		setAssignmentGrpChgTask: function(object){
+		
+		var application = new GlideRecord('cmdb_ci_appl');
+		application.addQuery('sys_id',object.cmdb_ci);
+		application.query();
+		if(application.next()){
+			if(application.support_group)
+				return application.support_group;
+		 }
+		},	
+			type: 'setAssignmentGroupFromCI'
+		};
