@@ -1,0 +1,92 @@
+(function executeRule(current, previous /*null when async*/) {
+	//Use this BR to create all BRs that are needed on INSERT and/or UPDATE Before database updates.
+	//Use if/else clauses to define execute conditions.
+	
+	//Global variables and functions
+	var count = 0;
+	var message = '';
+	function addValidationMessage(receivedMessage) {
+		count++;
+		message = message + count + ') '+ receivedMessage+'<br/>';
+	}
+	function getValidationMessage(){
+		return '<p>'+message+'</p>';
+	}
+	
+	
+	//Validation#1 : On RITM closure, check any open approvals - BEGIN
+	(function () {
+	//Closed Complete-3, Closed Incomplete-4, Closed Skipped-7
+	if (current.operation() == 'update'){
+		if (current.state.changesTo(3)){
+		var tsk = new GlideRecord("sysapproval_approver");
+		tsk.addQuery('sysapproval',current.sys_id);
+		tsk.addEncodedQuery('state=requested');
+		tsk.query();
+			if(tsk.getRowCount()>=1) {
+			addValidationMessage('All approvals must be obtained before closing a request.');
+			}
+		}
+		
+	}
+	})();
+	//Validation#1 : On RITM closure, check any open approvals - END
+	
+	//Validation#2 : On RITM closure, check any open Tasks - BEGIN
+	(function () {
+	//Closed Complete-3, Closed Incomplete-4, Closed Skipped-7
+	if (current.operation() == 'update'){
+		if (current.state.changesTo(3)){
+		var tsk = new GlideRecord("sc_task");
+		tsk.addQuery('request_item',current.sys_id);
+		tsk.addEncodedQuery('stateNOT IN3,4,7');
+		tsk.query();
+			if(tsk.getRowCount()>=1) {
+			addValidationMessage('All Tasks must be closed before closing a request.');
+			}
+		}
+		
+	}
+	})();
+	//Validation#2 : On RITM closure, check any open Tasks - END
+	
+	
+	//Validation#3 : On RITM closure, check assignee - BEGIN
+	(function () {
+	//Closed Complete-3, Closed Incomplete-4, Closed Skipped-7
+	if (current.operation() == 'update'){
+		if (current.state.changesTo(3)||current.state.changesTo(4)||current.state.changesTo(7)){
+			if(!current.assignment_group){
+			addValidationMessage('\'Assignment group\' must be present before closing a request.');
+			}
+		}
+		
+	}
+	})();
+	//Validation#3 : On RITM closure, check assignee - END
+	
+	//Validation#4 : On RITM closure, check assignee - BEGIN
+	(function () {
+	//Closed Complete-3, Closed Incomplete-4, Closed Skipped-7
+	if (current.operation() == 'update'){
+		if (current.state.changesTo(3)){
+			if(!current.assigned_to){
+			addValidationMessage('\'Assigned to\' must be present before closing a request.');
+			}
+		}
+		
+	}
+	})();
+	//Validation#4 : On RITM closure, check assignee - END
+	
+	
+	
+	
+	
+	//Validate finally
+	if (count>0){
+		current.setAbortAction(true);
+		gs.addErrorMessage(getValidationMessage());
+	}
+	
+})(current, previous);
