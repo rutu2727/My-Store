@@ -1,0 +1,26 @@
+(function refineQuery(current, parent) {
+	var liveN=[];
+	var liveNotify = new GlideRecord('live_notification');
+	liveNotify.addEncodedQuery("document="+parent.sys_id+"^table=incident");
+	liveNotify.query();
+	while(liveNotify.next())
+	{
+		liveN.push(liveNotify.sys_id.toString());
+	}
+	
+	var approval=[];
+	var approvalNotify=new GlideRecord('sysapproval_approver');
+	approvalNotify.addEncodedQuery("document_id="+parent.sys_id);
+	approvalNotify.query();
+	while(approvalNotify.next())
+		{
+			approval.push(approvalNotify.sys_id.toString());
+		}
+	
+	
+//current.addEncodedQuery("target_table=live_notification^instanceIN"+liveN.toString()+"^NQtarget_table=incident^instance="+parent.sys_id+"^NQtarget_table=sc_req_item^instance="+parent.sys_id);
+	current.addEncodedQuery("instance="+parent.sys_id+"^target_table=incident^NQtarget_table=live_notification^instanceIN"+liveN.join(",")+"^NQtarget_table=sysapproval_approver^instanceIN"+approval.join(","));
+	
+	
+	
+})(current, parent);
